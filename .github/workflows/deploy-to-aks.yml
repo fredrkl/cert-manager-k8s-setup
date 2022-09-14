@@ -48,8 +48,16 @@ jobs:
         files: ./yaml/cert-manager/cluster-issuer.yaml
         replacements: '$clientID=${{ secrets.AZURE_CERT_MANAGER_SP_APP_ID }},$azureSubscriptionId=${{ secrets.AZURE_SUBSCRIPTION_ID }},$azureTenantId=${{ secrets.AZURE_TENANT_ID }},$azureDnsZoneResourceGroup=${{ secrets.AZURE_DNS_ZONE_RESOURCE_GROUP }},$hostedZoneName=${{ secrets.AZURE_DNS_ZONE }}'
     
+    - name: Replace Action
+      uses: datamonsters/replace-action@v2
+      with:
+        files: ./yaml/cert-manager/certificate.yaml
+        replacements: '$exampleCert=${{ secrets.EXAMPLE_CERT }}'
+    
     - name: Run script
       run: |
         kubectl get nodes
         kubectl get ns
+        kubectl apply ./yaml/cert-manager/cert-manager.yaml
+        sleep 5
         kubectl apply -k ./yaml/cert-manager
