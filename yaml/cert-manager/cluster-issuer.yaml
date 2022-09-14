@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cluster-issuer
+  namespace: cert-manager
+spec:
+  acme:
+    server: https://api.test4.buypass.no/acme/directory
+    email: 'fredrik.klingenberg@outlook.com'
+    privateKeySecretRef:
+      name: acme-test
+    solvers:
+    - dns01:
+        azureDNS:
+          clientID: $clientID
+          clientSecretSecretRef:
+            name: azuredns-config
+            key: client-secret
+          subscriptionID: $azureSubscriptionId
+          tenantID: $azureTenantId
+          resourceGroupName: $azureDnsZoneResourceGroup
+          hostedZoneName: $hostedZoneName
+          environment: AzurePublicCloud

@@ -1,0 +1,4 @@
+resources:
+# - cert-manager.yaml
+# - dns-config-secret.yaml
+ - cluster-issuer.yaml

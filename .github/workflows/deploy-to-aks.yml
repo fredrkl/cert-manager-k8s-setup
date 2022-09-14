@@ -1,0 +1,55 @@
+name: Deploy to AKS
+
+on:
+  workflow_dispatch:
+  push:
+  workflow_run:
+    workflows: ["Create AKS"]
+    types:
+      - completed
+
+env:
+  CLUSTER_NAME: CertManager-Demo
+
+concurrency: pushing
+
+jobs:
+  Apply-yaml:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set Context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ env.CLUSTER_NAME }}
+        cluster-name: ${{ env.CLUSTER_NAME }}
+
+    - name: Kubectl tool installer
+      uses: Azure/setup-kubectl@v3
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Secret Parser lite
+      uses: yegobox/secret-parser@v1.0.1
+      with:
+        filename: ./yaml/cert-manager/dns-config-secret.yaml
+        secret-name: AZURE_DNS_CONFIG
+        secret-value: ${{ secrets.AZURE_DNS_CONFIG }}
+
+    - name: Replace Action
+      uses: datamonsters/replace-action@v2
+      with:
+        files: ./yaml/cert-manager/cluster-issuer.yaml
+        replacements: '$clientID=${{ secrets.AZURE_CERT_MANAGER_SP_APP_ID }},$azureSubscriptionId=${{ secrets.AZURE_SUBSCRIPTION_ID }},$azureTenantId=${{ secrets.AZURE_TENANT_ID }},$azureDnsZoneResourceGroup=${{ secrets.AZURE_DNS_ZONE_RESOURCE_GROUP }},$hostedZoneName=${{ secrets.AZURE_DNS_ZONE }}'
+    
+    - name: Run script
+      run: |
+        kubectl get nodes
+        kubectl get ns
+        kubectl apply -k ./yaml/cert-manager
