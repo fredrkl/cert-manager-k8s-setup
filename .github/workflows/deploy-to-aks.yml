@@ -58,6 +58,6 @@ jobs:
       run: |
         kubectl get nodes
         kubectl get ns
-        kubectl apply ./yaml/cert-manager/cert-manager.yaml
+        kubectl apply -f ./yaml/cert-manager/cert-manager.yaml
         sleep 5
         kubectl apply -k ./yaml/cert-manager
