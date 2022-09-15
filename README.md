@@ -27,6 +27,14 @@ There are some secrets and setup needed to get this repo going.
 
 - There are hardcoded values when installing the cert manager using kubectl apply <https://cert-manager.io/docs/installation/kubectl/#steps>. For example, setting a namespace in a kustomize file will break the installation.
 
+## Tip
+
+- <https://smallstep.com/cli/> is an excellent tool for inspecting and working with certificates.
+
+```bash
+> kubectl get secrets example-com-tls -o jsonpath='{.data.tls\.crt }' | step base64 -d | step certificate inspect
+```
+
 ## Status
 
 [![Create AKS](https://github.com/fredrkl/cert-manager-k8s-setup/actions/workflows/createaks.yml/badge.svg)](https://github.com/fredrkl/cert-manager-k8s-setup/actions/workflows/createaks.yml)
